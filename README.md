@@ -1,6 +1,6 @@
 # 🛒 AI Shopping Assistant
 
-An AI-powered Shopping Assistant that combines **Google Gemini**, **Model Context Protocol (MCP)**, **FastAPI**, **PostgreSQL**, and **Streamlit** to provide an intelligent shopping experience.
+An AI-powered Shopping Assistant built using **Google Gemini**, **Model Context Protocol (MCP)**, **FastAPI**, **PostgreSQL**, and **Streamlit**.
 
 The assistant understands natural language, searches products, remembers conversation context, verifies users, and places orders using MCP tools.
 
@@ -8,19 +8,19 @@ The assistant understands natural language, searches products, remembers convers
 
 # 🚀 Features
 
-- 🤖 AI-powered shopping assistant using Google Gemini
+- 🤖 AI-powered shopping assistant using Google Gemini Flash Lite
 - 🔍 Intelligent product search
-- 🛍 Product selection and ordering
+- 🛍️ Product selection and ordering
 - 👤 User verification using phone number
 - 🧠 Conversation memory and state management
-- 🔗 MCP (Model Context Protocol) tool integration
-- ⚡ FastAPI backend
-- 🗄 PostgreSQL database
-- 🖥 Streamlit user interface
+- 🔗 MCP (Model Context Protocol) integration
+- ⚡ FastAPI REST backend
+- 🗄️ PostgreSQL database
+- 🖥️ Streamlit web interface
 
 ---
 
-# 🏗 Architecture
+# 🏗️ System Architecture
 
 ```
                 User
@@ -33,7 +33,7 @@ The assistant understands natural language, searches products, remembers convers
                   │
         ┌─────────┴─────────┐
         ▼                   ▼
-   Gemini LLM          Conversation Memory
+   Gemini LLM      Conversation Memory
         │
         ▼
    MCP Tool Selection
@@ -53,36 +53,42 @@ The assistant understands natural language, searches products, remembers convers
 # 🔄 Workflow
 
 1. User enters a request.
-2. Gemini understands the intent.
+2. Gemini understands the user's intent.
 3. Gemini decides whether an MCP tool is required.
 4. The selected MCP tool is executed.
 5. FastAPI retrieves live data from PostgreSQL.
-6. Results are returned to the assistant.
-7. Conversation memory stores the selected product, current user, and conversation state.
+6. Results are returned through the MCP Server.
+7. Conversation memory stores the current context.
 8. The assistant responds naturally.
 
 ---
 
-# 🛠 Tech Stack
+# 🛠️ Tech Stack
 
 ## Frontend
+
 - Streamlit
 
 ## AI
+
 - Google Gemini Flash Lite
 - Prompt Engineering
 
 ## Protocol
+
 - Model Context Protocol (MCP)
 
 ## Backend
+
 - FastAPI
 - SQLAlchemy
 
 ## Database
+
 - PostgreSQL
 
-## Programming Language
+## Language
+
 - Python
 
 ---
@@ -92,7 +98,7 @@ The assistant understands natural language, searches products, remembers convers
 ```
 ai-shopping-assistant/
 │
-├── ai_assistant/        # AI Assistant
+├── ai_assistant/
 │   ├── app.py
 │   ├── chat_service.py
 │   ├── gemini_client.py
@@ -100,20 +106,21 @@ ai-shopping-assistant/
 │   ├── mcp_client.py
 │   └── tool_manager.py
 │
-├── app/                 # FastAPI Backend
-│   ├── models/
-│   ├── routes/
-│   ├── repositories/
-│   ├── services/
-│   ├── schemas/
-│   └── database/
-│
-├── mcp_server/          # MCP Server
-│   ├── tools/
+├── app/
 │   ├── database/
+│   ├── models/
+│   ├── repositories/
+│   ├── routes/
+│   ├── schemas/
+│   └── services/
+│
+├── mcp_server/
+│   ├── database/
+│   ├── tools/
 │   ├── utils/
 │   └── server.py
 │
+├── images/
 ├── requirements.txt
 └── README.md
 ```
@@ -130,14 +137,14 @@ The assistant maintains:
 - Pending Order
 - Conversation State
 
-This enables follow-up interactions such as:
+This enables natural follow-up conversations such as:
 
 ```
 Show me headphones
 
 ↓
 
-Sony WH-1000XM6
+Studio Headphones
 
 ↓
 
@@ -172,7 +179,7 @@ Order Created
 
 # 💾 Database
 
-The project uses PostgreSQL with the following entities:
+The system stores:
 
 - Products
 - Categories
@@ -182,39 +189,39 @@ The project uses PostgreSQL with the following entities:
 
 ---
 
-# ⚙ Installation
+# ⚙️ Installation
 
-Clone the repository
+### Clone the repository
 
 ```bash
 git clone https://github.com/kishor-prog/ai-shopping-assistant.git
 ```
 
-Move into the project
+### Move into the project
 
 ```bash
 cd ai-shopping-assistant
 ```
 
-Install dependencies
+### Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Run the FastAPI backend
+### Start the FastAPI backend
 
 ```bash
 python app/main.py
 ```
 
-Run the MCP Server
+### Start the MCP Server
 
 ```bash
 python mcp_server/server.py
 ```
 
-Run the Streamlit application
+### Launch the Streamlit application
 
 ```bash
 streamlit run ai_assistant/app.py
@@ -224,7 +231,27 @@ streamlit run ai_assistant/app.py
 
 # 📸 Screenshots
 
-Screenshots will be added in future updates.
+## 🏠 Home
+
+![Home](images/home.png)
+
+---
+
+## 🔍 Product Search
+
+![Product Search](images/product-selection.png)
+
+---
+
+## 👤 User Verification
+
+![User Verification](images/user-verification.png)
+
+---
+
+## ✅ Order Confirmation
+
+![Order Success](images/order-success.png)
 
 ---
 
@@ -234,8 +261,8 @@ Screenshots will be added in future updates.
 - Multi-product comparison
 - Shopping cart
 - Order history
-- Payment integration
-- Voice assistant support
+- Payment gateway integration
+- Voice assistant
 - Image-based product search
 
 ---
@@ -245,3 +272,5 @@ Screenshots will be added in future updates.
 **Kishor**
 
 GitHub: https://github.com/kishor-prog
+
+Repository: https://github.com/kishor-prog/ai-shopping-assistant
