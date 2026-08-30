@@ -1,17 +1,23 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
-class InventoryCreate(BaseModel):
+class InventoryBase(BaseModel):
     product_id: int
-    quantity: int
-    warehouse: str
+    quantity: int = 0
+    warehouse: str | None = None
 
 
-class InventoryResponse(BaseModel):
+class InventoryCreate(InventoryBase):
+    pass
+
+
+class InventoryUpdate(BaseModel):
+    product_id: int | None = None
+    quantity: int | None = None
+    warehouse: str | None = None
+
+
+class InventoryResponse(InventoryBase):
     id: int
-    product_id: int
-    quantity: int
-    warehouse: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

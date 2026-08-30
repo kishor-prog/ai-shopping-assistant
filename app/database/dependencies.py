@@ -9,7 +9,7 @@ def get_product_db():
     finally:
         db.close()
 
-#this function is used to get the order database sessionSSSSS
+# This function is used to get the order database session
 def get_order_db():
     db = OrderSessionLocal()
     try:

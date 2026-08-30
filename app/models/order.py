@@ -3,7 +3,7 @@ from sqlalchemy.sql import func
 
 from app.database.order_db import Base
 
-#this class is used to define the Order model in the database
+# This class defines the Order model in the order database
 class Order(Base):
     __tablename__ = "orders"
 
