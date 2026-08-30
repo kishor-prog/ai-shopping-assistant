@@ -1,11 +1,19 @@
 from google import genai
 import json
 
-from ai_assistant.config import GEMINI_API_KEY, MODEL_NAME
+from ai_assistant.config import get_gemini_api_key, MODEL_NAME
 
-client = genai.Client(api_key=GEMINI_API_KEY)
+_client = None
 
-#this function is used to analyze the user query and decide whether an MCP tool is required or not
+
+def get_client() -> genai.Client:
+    global _client
+    if _client is None:
+        _client = genai.Client(api_key=get_gemini_api_key())
+    return _client
+
+
+# This function is used to analyze the user query and decide whether an MCP tool is required or not
 def analyze_query(
     user_query: str,
     available_tools,
@@ -159,6 +167,7 @@ USER REQUEST
 
     print(">>> Sending request to Gemini...")
 
+    client = get_client()
     response = client.models.generate_content(
         model=MODEL_NAME,
         contents=prompt,
@@ -168,7 +177,7 @@ USER REQUEST
 
     return response.text
 
-#this fuction is used to convert the raw MCP output into a natural language response
+# This function is used to convert the raw MCP output into a natural language response
 
 def summarize_response(
     user_query: str,
@@ -194,6 +203,7 @@ Instructions:
 - Keep the response concise and conversational.
 """
 
+    client = get_client()
     response = client.models.generate_content(
         model=MODEL_NAME,
         contents=prompt,

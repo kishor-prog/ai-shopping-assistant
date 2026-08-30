@@ -1,3 +1,4 @@
+from decimal import Decimal
 from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
@@ -5,7 +6,7 @@ from app.models.product import Product
 from app.models.category import Category
 from app.schemas.product import ProductCreate
 
-#this class is used to interact with the Product table in the database with methods to create, get, update, delete, and search products
+# This class is used to interact with the Product table in the database
 class ProductRepository:
 
     @staticmethod
@@ -56,47 +57,61 @@ class ProductRepository:
     @staticmethod
     def search(
         db: Session,
-        keyword: str = None,
-        min_price: float = None,
-        max_price: float = None,
+        keyword: str | None = None,
+        min_price: float | None = None,
+        max_price: float | None = None,
     ):
         query = (
             db.query(Product)
             .join(Category, Product.category_id == Category.id)
         )
 
+        if min_price is not None:
+            query = query.filter(Product.price >= Decimal(str(min_price)))
+
+        if max_price is not None:
+            query = query.filter(Product.price <= Decimal(str(max_price)))
+
         if keyword:
-            keyword = keyword.strip().lower()
-
-            # Remove plural 's'
-            words = []
-            for word in keyword.split():
-                if word.endswith("s"):
-                    word = word[:-1]
-                words.append(word)
-
-            normalized_keyword = " ".join(words)
+            raw_keyword = keyword.strip()
+            keyword_lower = raw_keyword.lower()
 
             # ------------------------------------------------
             # 1. Exact product name
             # ------------------------------------------------
             exact_products = (
                 query.filter(
-                    Product.name.ilike(normalized_keyword)
+                    Product.name.ilike(raw_keyword)
                 ).all()
             )
 
             if exact_products:
                 return exact_products
 
+            # Remove plural 's'
+            words = []
+            for word in keyword_lower.split():
+                if word.endswith("s") and len(word) > 3:
+                    word = word[:-1]
+                words.append(word)
+
+            normalized_keyword = " ".join(words)
+
             # ------------------------------------------------
             # 2. Full phrase match
             # ------------------------------------------------
             phrase_products = (
                 query.filter(
-                    Product.name.ilike(f"%{normalized_keyword}%")
+                    Product.name.ilike(f"%{raw_keyword}%")
                 ).all()
             )
+
+            if not phrase_products and normalized_keyword != keyword_lower:
+                phrase_products = (
+                    query.filter(
+                        Product.name.ilike(f"%{normalized_keyword}%")
+                    ).all()
+                )
 
             if phrase_products:
                 return phrase_products
@@ -104,22 +119,16 @@ class ProductRepository:
             # ------------------------------------------------
             # 3. Search each word individually
             # ------------------------------------------------
-            filters = []
+            if words:
+                filters = []
+                for word in words:
+                    filters.extend([
+                        Product.name.ilike(f"%{word}%"),
+                        Product.description.ilike(f"%{word}%"),
+                        Category.name.ilike(f"%{word}%"),
+                    ])
 
-            for word in words:
-                filters.extend([
-                    Product.name.ilike(f"%{word}%"),
-                    Product.description.ilike(f"%{word}%"),
-                    Category.name.ilike(f"%{word}%"),
-                ])
-
-            query = query.filter(or_(*filters))
-
-        if min_price is not None:
-            query = query.filter(Product.price >= min_price)
-
-        if max_price is not None:
-            query = query.filter(Product.price <= max_price)
+                query = query.filter(or_(*filters))
 
         return query.all()
 

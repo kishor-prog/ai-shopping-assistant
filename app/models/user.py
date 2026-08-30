@@ -1,9 +1,9 @@
 from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.sql import func
 
-from app.database.product_db import Base
+from app.database.order_db import Base
 
-#this class is used to define the User model in the database
+# This class defines the User model in the order database
 class User(Base):
     __tablename__ = "users"
 

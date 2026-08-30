@@ -1,10 +1,12 @@
 import httpx
+from mcp_server.settings import settings
 
-#this class is used to make API requests to the FastAPI backend server
+# This class is used to make API requests to the FastAPI backend server
 class APIClient:
 
     def __init__(self):
-        self.base_url = "http://127.0.0.1:8000"
+        self.base_url = settings.BACKEND_URL.rstrip("/")
+        self.timeout = settings.REQUEST_TIMEOUT
 
     def _request(
         self,
@@ -13,11 +15,11 @@ class APIClient:
         **kwargs,
     ):
         try:
-
+            timeout = kwargs.pop("timeout", self.timeout)
             response = httpx.request(
                 method=method,
                 url=f"{self.base_url}{endpoint}",
-                timeout=5,
+                timeout=timeout,
                 **kwargs,
             )
 

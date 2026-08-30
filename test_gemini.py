@@ -1,20 +1,14 @@
-from dotenv import load_dotenv
-from pathlib import Path
-import os
 from google import genai
+from ai_assistant.config import get_gemini_api_key, MODEL_NAME
 
-env_path = Path(__file__).parent / "ai_assistant" / ".env"
-load_dotenv(env_path)
+api_key = get_gemini_api_key()
+print(f"API Key loaded (length: {len(api_key)})")
 
-print(os.getenv("GEMINI_API_KEY"))
-
-client = genai.Client(
-    api_key=os.getenv("GEMINI_API_KEY")
-)
+client = genai.Client(api_key=api_key)
 
 response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents="Hello"
+    model=MODEL_NAME,
+    contents="Hello",
 )
 
 print(response.text)

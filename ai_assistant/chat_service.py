@@ -1,9 +1,8 @@
 import json
+import re
 import traceback
 
-from google import genai
-
-from ai_assistant.config import GEMINI_API_KEY, MODEL_NAME
+from ai_assistant.config import MODEL_NAME
 from ai_assistant.gemini_client import (
     analyze_query,
     summarize_response,
@@ -11,18 +10,30 @@ from ai_assistant.gemini_client import (
 from ai_assistant.mcp_client import MCPClient
 from ai_assistant.conversation_memory import ConversationMemory
 
-#this class handles the conversation state, idle state, waiting for email, phone, name, order
-#conversation handels the user query and decides what to do
-#waiting for email this function collects the user email and creates a new user in the database
-#waiting for phone this fuction collects the user phone number and checks the database whether the user exists or not
-#same for both name and order and if everything are correct it will place the order 
+
+def extract_json_response(raw_text: str) -> dict:
+    """Extract and parse JSON from Gemini's response safely."""
+    cleaned = raw_text.strip()
+    if cleaned.startswith("```"):
+        cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r"\s*```$", "", cleaned)
+    cleaned = cleaned.strip()
+
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        # Match outermost JSON object { ... }
+        match = re.search(r"(\{.*\})", cleaned, flags=re.DOTALL)
+        if match:
+            return json.loads(match.group(1))
+        raise
+
 
 class ChatService:
 
     def __init__(self):
         self.mcp = MCPClient()
         self.memory = ConversationMemory()
-        self.client = genai.Client(api_key=GEMINI_API_KEY)
 
     # ==========================================================
     # Conversation State Machine
@@ -104,8 +115,6 @@ class ChatService:
                     "Before placing your order,\n"
                     "please enter your phone number."
                 )
-
-                return None
 
         # --------------------------------------------------
         # WAITING EMAIL
@@ -341,29 +350,10 @@ class ChatService:
             print(decision)
             print("=========================================\n")
 
-            decision = decision.strip()
+            decision_dict = extract_json_response(decision)
 
-            # Remove Markdown code fences
-            if decision.startswith("```"):
-                lines = decision.splitlines()
-
-                # Remove opening fence (``` or ```json)
-                lines = lines[1:]
-
-                # Remove closing fence if present
-                if lines and lines[-1].strip() == "```":
-                    lines = lines[:-1]
-
-                decision = "\n".join(lines).strip()
-
-            print("\n========== CLEANED GEMINI RESPONSE ==========")
-            print(repr(decision))
-            print("=============================================\n")
-
-            decision = json.loads(decision)
-
-            tool_name = decision.get("tool")
-            arguments = decision.get(
+            tool_name = decision_dict.get("tool")
+            arguments = decision_dict.get(
                 "arguments",
                 {},
             )
@@ -371,7 +361,7 @@ class ChatService:
             print("\n========== GEMINI ==========")
             print(
                 json.dumps(
-                    decision,
+                    decision_dict,
                     indent=4,
                 )
             )
@@ -383,7 +373,7 @@ class ChatService:
 
             if tool_name is None:
 
-                return decision.get(
+                return decision_dict.get(
                     "response",
                     "How can I help you?",
                 )

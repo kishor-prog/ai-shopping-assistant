@@ -1,10 +1,10 @@
 from google import genai
-from ai_assistant.config import GEMINI_API_KEY
+from ai_assistant.config import get_gemini_api_key, MODEL_NAME
 
-client = genai.Client(api_key=GEMINI_API_KEY)
+client = genai.Client(api_key=get_gemini_api_key())
 
 response = client.models.generate_content(
-    model="gemini-flash-latest",
+    model=MODEL_NAME,
     contents="Say hello in one sentence."
 )
 
